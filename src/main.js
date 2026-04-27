@@ -17,11 +17,14 @@ const evalScoreElement = document.getElementById("eval-score");
 const historyElement = document.getElementById("history");
 const newGameBtn = document.getElementById("newGame");
 const undoBtn = document.getElementById("undo");
+const hintBtn = document.getElementById("hint");
+const hintTextElement = document.getElementById("hintText");
 
 let engineThinking = false;
 let BOT_LEVEL = 2;
 let lastMove = null;
 let lastEval = { type: "cp", value: 0 };
+let hintShape = null;
 let cg;
 
 const levelSelect = document.getElementById("level");
@@ -67,6 +70,12 @@ function syncBoard() {
     turnColor,
     lastMove,
     check: game.inCheck(),
+    drawable: {
+      enabled: false,
+      visible: true,
+      eraseOnClick: false,
+      shapes: hintShape ? [hintShape] : [],
+    },
     movable: {
       free: false,
       color: engineThinking ? undefined : "white",
@@ -99,6 +108,8 @@ function onMove(orig, dest) {
     return;
   }
   lastMove = [move.from, move.to];
+  hintShape = null;
+  hintTextElement.textContent = "Hint: -";
 
   engineThinking = true;
   syncBoard();
@@ -217,6 +228,8 @@ newGameBtn.addEventListener("click", () => {
   game.reset();
   lastMove = null;
   lastEval = { type: "cp", value: 0 };
+  hintShape = null;
+  hintTextElement.textContent = "Hint: -";
   engineThinking = false;
   syncBoard();
 });
@@ -230,7 +243,40 @@ undoBtn.addEventListener("click", () => {
   const last = history[history.length - 1];
   lastMove = last ? [last.from, last.to] : null;
 
+  hintShape = null;
+  hintTextElement.textContent = "Hint: -";
   engineThinking = false;
+  syncBoard();
+});
+
+hintBtn.addEventListener("click", async () => {
+  if (engineThinking || game.isGameOver()) return;
+
+  if (game.turn() !== "w") {
+    hintTextElement.textContent = "Hint: wait for your turn";
+    return;
+  }
+
+  hintTextElement.textContent = "Hint: thinking...";
+
+  const result = await getBestMove(game.fen(), 10);
+  const move = result?.move;
+
+  if (!move || move === "(none)") {
+    hintTextElement.textContent = "Hint: no move";
+    return;
+  }
+
+  const from = move.substring(0, 2);
+  const to = move.substring(2, 4);
+
+  hintShape = {
+    orig: from,
+    dest: to,
+    brush: "green",
+  };
+
+  hintTextElement.textContent = `Best: ${from} → ${to}`;
   syncBoard();
 });
 

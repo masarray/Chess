@@ -150,3 +150,88 @@ select {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
   white-space: nowrap;
 }
+
+#hintText {
+  font-size: 13px;
+  color: #cbd5e1;
+  min-height: 18px;
+}
+
+.cg-wrap svg {
+  pointer-events: none !important;
+}
+
+.cg-wrap .cg-shapes,
+.cg-wrap .cg-custom-svgs {
+  pointer-events: none !important;
+}
+
+@media (max-width: 720px) {
+  body {
+    align-items: start;
+    min-height: 100dvh;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  #app {
+    width: 100%;
+  }
+
+  #container {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  #board-area {
+    width: 100%;
+  }
+
+  #board-wrap {
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  #board {
+    width: min(88vw, 420px);
+    height: min(88vw, 420px);
+  }
+
+  #eval-bar {
+    width: 22px;
+    height: min(88vw, 420px);
+  }
+
+  #panel {
+    width: min(94vw, 420px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .card {
+    border-radius: 14px;
+  }
+
+  .card:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  button,
+  select {
+    min-height: 44px;
+    font-size: 15px;
+  }
+
+  #history {
+    max-height: 90px;
+  }
+
+  #status {
+    font-size: 14px;
+    margin-top: 8px;
+  }
+}
