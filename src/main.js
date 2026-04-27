@@ -32,6 +32,9 @@ const levelSelect = document.getElementById("level");
 const levelLabelElement = document.getElementById("levelLabel");
 const evalChipElement = document.getElementById("eval-chip");
 
+const botCapturedElement = document.getElementById("botCaptured");
+const userCapturedElement = document.getElementById("userCaptured");
+
 levelSelect.addEventListener("change", () => {
   BOT_LEVEL = parseInt(levelSelect.value);
 
@@ -97,6 +100,7 @@ function syncBoard() {
   updateStatus();
   updateHistory();
   updateEvalBar();
+  updateCapturedPieces();
 }
 
 function onMove(orig, dest) {
@@ -237,6 +241,37 @@ function updateEvalBar() {
     evalChipElement.textContent =
       pawns >= 0 ? `+${pawns.toFixed(1)}` : pawns.toFixed(1);
   }
+}
+
+function updateCapturedPieces() {
+  if (!botCapturedElement || !userCapturedElement) return;
+
+  const history = game.history({ verbose: true });
+
+  const capturedByWhite = []; // black pieces captured by You
+  const capturedByBlack = []; // white pieces captured by Bot
+
+  history.forEach((move) => {
+    if (!move.captured) return;
+
+    const piece = move.captured.toUpperCase(); // P,N,B,R,Q
+
+    if (move.color === "w") {
+      capturedByWhite.push(`b${piece}.svg`);
+    } else {
+      capturedByBlack.push(`w${piece}.svg`);
+    }
+  });
+
+  const base = `${import.meta.env.BASE_URL}pieces/mpchess/`;
+
+  userCapturedElement.innerHTML = capturedByWhite
+    .map((file) => `<img src="${base}${file}" alt="">`)
+    .join("");
+
+  botCapturedElement.innerHTML = capturedByBlack
+    .map((file) => `<img src="${base}${file}" alt="">`)
+    .join("");
 }
 
 // NEW GAME
