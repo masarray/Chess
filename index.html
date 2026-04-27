@@ -8,43 +8,46 @@
   </head>
   <body>
     <div id="app">
-      <div id="container">
-        <!-- LEFT: BOARD -->
-        <div id="board-area">
-          <div id="board-wrap">
-            <div id="eval-bar">
-              <div id="eval-fill"></div>
-              <div id="eval-score">0.0</div>
-            </div>
-            <div id="board"></div>
-          </div>
-          <div id="status">Ready</div>
-        </div>
-
-        <!-- RIGHT: PANEL -->
-        <div id="panel">
-          <div class="card">
-            <label>Bot Level</label>
-            <select id="level">
-              <option value="1">Beginner</option>
-              <option value="2" selected>Casual</option>
-              <option value="3">Intermediate</option>
-              <option value="4">Master</option>
-            </select>
-          </div>
-
-          <div class="card">
-            <button id="newGame">New Game</button>
-            <button id="undo">Undo</button>
-            <button id="hint">Hint</button>
-            <div id="hintText">Hint: -</div>
-          </div>
-
-          <div class="card">
-            <div id="history"></div>
-          </div>
-        </div>
+      <!-- HEADER -->
+      <div id="header">
+        <div id="title">Chess</div>
+        <div id="status">Ready</div>
+        <select id="level">
+          <option value="1">Beginner</option>
+          <option value="2" selected>Casual</option>
+          <option value="3">Intermediate</option>
+          <option value="4">Master</option>
+        </select>
       </div>
+
+      <!-- BOARD -->
+      <div id="board-wrap">
+        <div id="eval-bar">
+          <div id="eval-fill"></div>
+          <div id="eval-score">0.0</div>
+        </div>
+        <div id="board"></div>
+      </div>
+
+      <!-- BOTTOM BAR -->
+      <div id="bottom-bar">
+        <button id="newGame" class="tool">
+          <span class="icon">⟲</span>
+          <span>New</span>
+        </button>
+
+        <button id="undo" class="tool">
+          <span class="icon">↩</span>
+          <span>Undo</span>
+        </button>
+
+        <button id="hint" class="tool">
+          <span class="icon">💡</span>
+          <span>Hint</span>
+        </button>
+      </div>
+
+      <div id="hintText">Hint: -</div>
     </div>
 
     <script type="module" src="/src/main.js"></script>

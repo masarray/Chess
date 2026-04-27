@@ -118,6 +118,8 @@ function onMove(orig, dest) {
 }
 
 function updateHistory() {
+  if (!historyElement) return;
+
   const history = game.history({ verbose: true });
 
   let html = "";
