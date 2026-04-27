@@ -1,0 +1,116 @@
+import { Chess, SQUARES } from "chess.js";
+import { Chessground } from "chessground";
+
+import "chessground/assets/chessground.base.css";
+import "chessground/assets/chessground.brown.css";
+import "chessground/assets/chessground.cburnett.css";
+
+const game = new Chess();
+
+const boardElement = document.getElementById("board");
+const statusElement = document.getElementById("status");
+
+let engineThinking = false;
+
+function updateStatus() {
+  if (game.isCheckmate()) {
+    statusElement.innerText = "Checkmate!";
+  } else if (game.isDraw()) {
+    statusElement.innerText = "Draw!";
+  } else if (engineThinking) {
+    statusElement.innerText = "Computer thinking...";
+  } else {
+    statusElement.innerText = game.turn() === "w" ? "White to move" : "Black to move";
+  }
+}
+
+function getDests() {
+  const dests = new Map();
+
+  SQUARES.forEach((sq) => {
+    const moves = game.moves({ square: sq, verbose: true });
+    if (moves.length) {
+      dests.set(sq, moves.map((m) => m.to));
+    }
+  });
+
+  return dests;
+}
+
+function syncBoard() {
+  const turnColor = game.turn() === "w" ? "white" : "black";
+
+  cg.set({
+    fen: game.fen(),
+    turnColor,
+    movable: {
+      free: false,
+      color: engineThinking ? undefined : turnColor,
+      dests: getDests()
+    }
+  });
+
+  updateStatus();
+}
+
+const cg = Chessground(boardElement, {
+  orientation: "white",
+  fen: game.fen(),
+  turnColor: "white",
+  movable: {
+    free: false,
+    color: "white",
+    dests: getDests(),
+    events: {
+      after: onMove
+    }
+  }
+});
+
+function onMove(orig, dest) {
+  if (engineThinking) {
+    syncBoard();
+    return;
+  }
+
+  if (game.turn() !== "w") {
+    syncBoard();
+    return;
+  }
+
+  const move = game.move({
+    from: orig,
+    to: dest,
+    promotion: "q"
+  });
+
+  if (!move) {
+    syncBoard();
+    return;
+  }
+
+  engineThinking = true;
+  syncBoard();
+
+  setTimeout(makeRandomMove, 500);
+}
+
+function makeRandomMove() {
+  if (game.isGameOver()) {
+    engineThinking = false;
+    syncBoard();
+    return;
+  }
+
+  const moves = game.moves();
+
+  if (moves.length > 0) {
+    const randomMove = moves[Math.floor(Math.random() * moves.length)];
+    game.move(randomMove);
+  }
+
+  engineThinking = false;
+  syncBoard();
+}
+
+syncBoard();

@@ -1,0 +1,44 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess PWA</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="container">
+        <!-- LEFT: BOARD -->
+        <div id="board-area">
+          <div id="board"></div>
+          <div id="status">Ready</div>
+        </div>
+
+        <!-- RIGHT: PANEL -->
+        <div id="panel">
+          <div class="card">
+            <label>Bot Level</label>
+            <select id="level">
+              <option value="1">Beginner</option>
+              <option value="2" selected>Casual</option>
+              <option value="3">Intermediate</option>
+              <option value="4">Master</option>
+            </select>
+          </div>
+
+          <div class="card">
+            <button id="newGame">New Game</button>
+            <button id="undo">Undo</button>
+          </div>
+
+          <div class="card">
+            <div id="history"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
