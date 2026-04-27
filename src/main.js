@@ -4,6 +4,7 @@ import { Chessground } from "chessground";
 import "chessground/assets/chessground.base.css";
 import "chessground/assets/chessground.brown.css";
 import "chessground/assets/chessground.cburnett.css";
+
 import { initEngine, getBestMove } from "./engine.js";
 
 const game = new Chess();
@@ -28,9 +29,16 @@ let hintShape = null;
 let cg;
 
 const levelSelect = document.getElementById("level");
+const levelLabelElement = document.getElementById("levelLabel");
+const evalChipElement = document.getElementById("eval-chip");
 
 levelSelect.addEventListener("change", () => {
   BOT_LEVEL = parseInt(levelSelect.value);
+
+  const selectedText = levelSelect.options[levelSelect.selectedIndex].text;
+  if (levelLabelElement) {
+    levelLabelElement.textContent = selectedText;
+  }
 });
 
 function getDests() {
@@ -212,7 +220,9 @@ function updateEvalBar() {
 
   if (lastEval.type === "mate") {
     evalFillElement.style.height = lastEval.value > 0 ? "95%" : "5%";
-    evalScoreElement.textContent = `M${Math.abs(lastEval.value)}`;
+    const mateText = `M${Math.abs(lastEval.value)}`;
+    evalScoreElement.textContent = mateText;
+    if (evalChipElement) evalChipElement.textContent = mateText;
     return;
   }
 
@@ -223,6 +233,10 @@ function updateEvalBar() {
   evalFillElement.style.height = `${whitePercent}%`;
   evalScoreElement.textContent =
     pawns >= 0 ? `+${pawns.toFixed(1)}` : pawns.toFixed(1);
+  if (evalChipElement) {
+    evalChipElement.textContent =
+      pawns >= 0 ? `+${pawns.toFixed(1)}` : pawns.toFixed(1);
+  }
 }
 
 // NEW GAME
@@ -287,6 +301,9 @@ cg = Chessground(boardElement, {
   orientation: "white",
   fen: game.fen(),
   turnColor: "white",
+
+  animation: { enabled: true, duration: 200 },
+
   movable: {
     free: false,
     color: "white",

@@ -9,9 +9,22 @@
   <body>
     <div id="app">
       <!-- HEADER -->
-      <div id="header">
-        <div id="title">Chess</div>
-        <div id="status">Ready</div>
+      <div id="appbar">
+        <div class="brand">
+          <span class="brand-icon">♟</span>
+          <span>Chess</span>
+        </div>
+        <div class="menu-icon">☰</div>
+      </div>
+
+      <div class="player-card bot-card">
+        <div class="avatar">🤖</div>
+        <div class="player-info">
+          <div class="player-name">Stockfish Bot</div>
+          <div class="player-sub">
+            Level <span id="levelLabel">Casual</span>
+          </div>
+        </div>
         <select id="level">
           <option value="1">Beginner</option>
           <option value="2" selected>Casual</option>
@@ -27,6 +40,15 @@
           <div id="eval-score">0.0</div>
         </div>
         <div id="board"></div>
+      </div>
+
+      <div class="player-card user-card">
+        <div class="avatar user-avatar">🙂</div>
+        <div class="player-info">
+          <div class="player-name">You</div>
+          <div id="status" class="player-sub">Ready</div>
+        </div>
+        <div id="eval-chip">0.0</div>
       </div>
 
       <!-- BOTTOM BAR -->
