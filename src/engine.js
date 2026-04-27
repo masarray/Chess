@@ -22,6 +22,8 @@ export function getBestMove(fen, depth = 8) {
       return;
     }
 
+    let lastScore = null;
+
     const timeout = setTimeout(() => {
       console.warn("Stockfish timeout");
       resolve(null);
@@ -31,9 +33,20 @@ export function getBestMove(fen, depth = 8) {
       const line = String(event.data);
       console.log("[SF]", line);
 
+      const scoreMatch = line.match(/score (cp|mate) (-?\d+)/);
+      if (scoreMatch) {
+        lastScore = {
+          type: scoreMatch[1],
+          value: parseInt(scoreMatch[2], 10),
+        };
+      }
+
       if (line.startsWith("bestmove")) {
         clearTimeout(timeout);
-        resolve(line.split(" ")[1]);
+        resolve({
+          move: line.split(" ")[1],
+          score: lastScore,
+        });
       }
     };
 

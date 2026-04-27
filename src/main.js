@@ -11,6 +11,8 @@ initEngine();
 
 const boardElement = document.getElementById("board");
 const statusElement = document.getElementById("status");
+const evalFillElement = document.getElementById("eval-fill");
+const evalScoreElement = document.getElementById("eval-score");
 
 const historyElement = document.getElementById("history");
 const newGameBtn = document.getElementById("newGame");
@@ -18,6 +20,8 @@ const undoBtn = document.getElementById("undo");
 
 let engineThinking = false;
 let BOT_LEVEL = 2;
+let lastMove = null;
+let lastEval = { type: "cp", value: 0 };
 let cg;
 
 const levelSelect = document.getElementById("level");
@@ -61,6 +65,8 @@ function syncBoard() {
   cg.set({
     fen: game.fen(),
     turnColor,
+    lastMove,
+    check: game.inCheck(),
     movable: {
       free: false,
       color: engineThinking ? undefined : "white",
@@ -73,6 +79,7 @@ function syncBoard() {
 
   updateStatus();
   updateHistory();
+  updateEvalBar();
 }
 
 function onMove(orig, dest) {
@@ -91,6 +98,7 @@ function onMove(orig, dest) {
     syncBoard();
     return;
   }
+  lastMove = [move.from, move.to];
 
   engineThinking = true;
   syncBoard();
@@ -146,7 +154,12 @@ async function makeComputerMove() {
       randomness = 0.2;
   }
 
-  let bestMove = await getBestMove(game.fen(), depth);
+  const engineResult = await getBestMove(game.fen(), depth);
+  let bestMove = engineResult?.move || null;
+
+  if (engineResult?.score) {
+    lastEval = engineResult.score;
+  }
 
   // 💡 inject "human mistake"
   // Use verbose move object, not SAN string like "c5".
@@ -158,13 +171,16 @@ async function makeComputerMove() {
 
   if (bestMove) {
     if (typeof bestMove === "string") {
-      game.move({
+      const move = game.move({
         from: bestMove.substring(0, 2),
         to: bestMove.substring(2, 4),
         promotion: bestMove.length >= 5 ? bestMove.substring(4, 5) : "q",
       });
+
+      if (move) lastMove = [move.from, move.to];
     } else {
-      game.move(bestMove);
+      const move = game.move(bestMove);
+      if (move) lastMove = [move.from, move.to];
     }
   }
 
@@ -172,9 +188,35 @@ async function makeComputerMove() {
   syncBoard();
 }
 
+function updateEvalBar() {
+  if (!evalFillElement || !evalScoreElement) return;
+
+  if (!lastEval) {
+    evalFillElement.style.height = "50%";
+    evalScoreElement.textContent = "0.0";
+    return;
+  }
+
+  if (lastEval.type === "mate") {
+    evalFillElement.style.height = lastEval.value > 0 ? "95%" : "5%";
+    evalScoreElement.textContent = `M${Math.abs(lastEval.value)}`;
+    return;
+  }
+
+  const pawns = lastEval.value / 100;
+  const clamped = Math.max(-5, Math.min(5, pawns));
+  const whitePercent = 50 + clamped * 8;
+
+  evalFillElement.style.height = `${whitePercent}%`;
+  evalScoreElement.textContent =
+    pawns >= 0 ? `+${pawns.toFixed(1)}` : pawns.toFixed(1);
+}
+
 // NEW GAME
 newGameBtn.addEventListener("click", () => {
   game.reset();
+  lastMove = null;
+  lastEval = { type: "cp", value: 0 };
   engineThinking = false;
   syncBoard();
 });
@@ -183,6 +225,11 @@ newGameBtn.addEventListener("click", () => {
 undoBtn.addEventListener("click", () => {
   game.undo(); // computer
   game.undo(); // player
+
+  const history = game.history({ verbose: true });
+  const last = history[history.length - 1];
+  lastMove = last ? [last.from, last.to] : null;
+
   engineThinking = false;
   syncBoard();
 });
