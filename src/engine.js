@@ -1,7 +1,9 @@
 let stockfish = null;
 
 export function initEngine() {
-  stockfish = new Worker("/stockfish/stockfish-18-asm.js");
+  stockfish = new Worker(
+    `${import.meta.env.BASE_URL}stockfish/stockfish-18-asm.js`,
+  );
 
   stockfish.onmessage = (event) => {
     console.log("[SF INIT]", String(event.data));
