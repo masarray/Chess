@@ -36,6 +36,16 @@ const sound = {
 const userStatusDot = document.querySelector(".user-card .status-dot");
 const botStatusDot = document.querySelector(".bot-card .status-dot");
 
+function setStatus(dot, state) {
+  if (!dot) return;
+  dot.classList.remove("online", "thinking", "offline");
+  dot.classList.add(state);
+}
+
+// DEFAULT STATUS (INI PATCH 1)
+setStatus(userStatusDot, "online");
+setStatus(botStatusDot, "online");
+
 let audioUnlocked = false;
 
 function unlockAudio() {
@@ -97,10 +107,24 @@ levelSelect.addEventListener("change", () => {
   }
 });
 
-function setStatus(dot, state) {
-  if (!dot) return;
-  dot.classList.remove("online", "thinking", "offline");
-  dot.classList.add(state);
+const userCard = document.querySelector(".user-card");
+const botCard = document.querySelector(".bot-card");
+
+function setTurn(state) {
+  userCard.classList.remove("active");
+  botCard.classList.remove("active", "thinking");
+
+  if (state === "user") {
+    userCard.classList.add("active");
+    setStatus(userStatusDot, "online");
+    setStatus(botStatusDot, "offline");
+  }
+
+  if (state === "bot") {
+    botCard.classList.add("thinking");
+    setStatus(botStatusDot, "thinking");
+    setStatus(userStatusDot, "online");
+  }
 }
 
 function getDests() {
@@ -122,8 +146,12 @@ function getDests() {
 function updateStatus() {
   if (game.isCheckmate()) {
     statusElement.textContent = "Checkmate";
+    setStatus(userStatusDot, "offline");
+    setStatus(botStatusDot, "offline");
   } else if (game.isDraw()) {
     statusElement.textContent = "Draw";
+    setStatus(userStatusDot, "offline");
+    setStatus(botStatusDot, "offline");
   } else if (engineThinking) {
     statusElement.textContent = "Computer thinking...";
   } else {
@@ -186,6 +214,8 @@ function onMove(orig, dest) {
   hintTextElement.textContent = "Hint: -";
 
   engineThinking = true;
+  setStatus(botStatusDot, "thinking");
+  setTurn("bot");
   syncBoard();
 
   setTimeout(makeComputerMove, 500);
@@ -212,6 +242,8 @@ function updateHistory() {
 async function makeComputerMove() {
   if (game.isGameOver()) {
     engineThinking = false;
+    setStatus(botStatusDot, "online");
+    setTurn("user");
     syncBoard();
     return;
   }
@@ -272,10 +304,13 @@ async function makeComputerMove() {
     if (move) {
       lastMove = [move.from, move.to];
       playMoveSound(move);
+      setTurn("bot");
     }
   }
 
   engineThinking = false;
+  setStatus(botStatusDot, "online");
+  setTurn("user");
   syncBoard();
 }
 
@@ -353,6 +388,9 @@ function resetGame() {
   if (userCapturedElement) userCapturedElement.innerHTML = "";
 
   engineThinking = false;
+  setStatus(userStatusDot, "online");
+  setStatus(botStatusDot, "online");
+  setTurn("user");
   syncBoard();
 }
 
@@ -410,6 +448,8 @@ undoBtn.addEventListener("click", () => {
   hintShape = null;
   hintTextElement.textContent = "Hint: -";
   engineThinking = false;
+  setStatus(botStatusDot, "online");
+  setTurn("user");
   syncBoard();
 });
 

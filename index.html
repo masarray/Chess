@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chess PWA</title>
     <link rel="stylesheet" href="/src/style.css" />
+    <!-- Favicon (browser tab) -->
+    <link rel="icon" href="/Chess/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/Chess/favicon.svg" />
+    <link rel="icon" type="image/png" href="/Chess/favicon.png" />
+
+    <!-- Apple / mobile -->
+    <link rel="apple-touch-icon" href="/Chess/apple-touch-icon.png" />
+
+    <!-- (optional tapi bagus) -->
+    <meta name="theme-color" content="#07111f" />
   </head>
   <body>
     <div id="app">
@@ -18,6 +28,7 @@
       </div>
 
       <div class="player-card bot-card">
+        <div class="turn-indicator"></div>
         <div class="avatar-wrap">
           <div class="avatar bot-avatar">
             <img src="/Chess/avatar/avatar6.svg" alt="bot" />
@@ -49,6 +60,7 @@
       </div>
 
       <div class="player-card user-card">
+        <div class="turn-indicator"></div>
         <div class="avatar-wrap">
           <div class="avatar user-avatar">
             <img src="/Chess/avatar/avatar11.svg" alt="user" />
