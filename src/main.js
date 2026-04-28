@@ -3,7 +3,7 @@ import { Chessground } from "chessground";
 
 import "chessground/assets/chessground.base.css";
 import "chessground/assets/chessground.brown.css";
-import "chessground/assets/chessground.cburnett.css";
+//import "chessground/assets/chessground.cburnett.css";
 
 import { initEngine, getBestMove } from "./engine.js";
 
@@ -20,6 +20,59 @@ const newGameBtn = document.getElementById("newGame");
 const undoBtn = document.getElementById("undo");
 const hintBtn = document.getElementById("hint");
 const hintTextElement = document.getElementById("hintText");
+
+const confirmModal = document.getElementById("confirmModal");
+const confirmNewGameBtn = document.getElementById("confirmNewGame");
+const cancelNewGameBtn = document.getElementById("cancelNewGame");
+
+const SOUND_BASE = `${import.meta.env.BASE_URL}sounds/`;
+
+const sound = {
+  move: new Audio(`${SOUND_BASE}Move.mp3`),
+  capture: new Audio(`${SOUND_BASE}Capture.mp3`),
+  check: new Audio(`${SOUND_BASE}Check.mp3`),
+};
+
+const userStatusDot = document.querySelector(".user-card .status-dot");
+const botStatusDot = document.querySelector(".bot-card .status-dot");
+
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  Object.values(sound).forEach((s) => {
+    s.volume = 0.65;
+    s.preload = "auto";
+    s.load();
+  });
+
+  audioUnlocked = true;
+}
+
+function playSound(type) {
+  unlockAudio();
+
+  const s = sound[type];
+  if (!s) return;
+
+  s.currentTime = 0;
+  s.play().catch((err) => {
+    console.warn("Sound blocked or missing:", type, s.src, err);
+  });
+}
+
+window.addEventListener("pointerdown", unlockAudio, { once: true });
+
+function playMoveSound(move) {
+  if (game.inCheck()) {
+    playSound("check");
+  } else if (move?.captured) {
+    playSound("capture");
+  } else {
+    playSound("move");
+  }
+}
 
 let engineThinking = false;
 let BOT_LEVEL = 2;
@@ -43,6 +96,12 @@ levelSelect.addEventListener("change", () => {
     levelLabelElement.textContent = selectedText;
   }
 });
+
+function setStatus(dot, state) {
+  if (!dot) return;
+  dot.classList.remove("online", "thinking", "offline");
+  dot.classList.add(state);
+}
 
 function getDests() {
   const dests = new Map();
@@ -119,6 +178,9 @@ function onMove(orig, dest) {
     syncBoard();
     return;
   }
+
+  playMoveSound(move);
+
   lastMove = [move.from, move.to];
   hintShape = null;
   hintTextElement.textContent = "Hint: -";
@@ -195,17 +257,21 @@ async function makeComputerMove() {
   }
 
   if (bestMove) {
+    let move = null;
+
     if (typeof bestMove === "string") {
-      const move = game.move({
+      move = game.move({
         from: bestMove.substring(0, 2),
         to: bestMove.substring(2, 4),
         promotion: bestMove.length >= 5 ? bestMove.substring(4, 5) : "q",
       });
-
-      if (move) lastMove = [move.from, move.to];
     } else {
-      const move = game.move(bestMove);
-      if (move) lastMove = [move.from, move.to];
+      move = game.move(bestMove);
+    }
+
+    if (move) {
+      lastMove = [move.from, move.to];
+      playMoveSound(move);
     }
   }
 
@@ -233,8 +299,9 @@ function updateEvalBar() {
   const pawns = lastEval.value / 100;
   const clamped = Math.max(-5, Math.min(5, pawns));
   const whitePercent = 50 + clamped * 8;
+  const inverted = 100 - whitePercent;
 
-  evalFillElement.style.height = `${whitePercent}%`;
+  evalFillElement.style.height = `${inverted}%`;
   evalScoreElement.textContent =
     pawns >= 0 ? `+${pawns.toFixed(1)}` : pawns.toFixed(1);
   if (evalChipElement) {
@@ -263,7 +330,7 @@ function updateCapturedPieces() {
     }
   });
 
-  const base = `${import.meta.env.BASE_URL}pieces/mpchess/`;
+  const base = `${import.meta.env.BASE_URL}pieces/staunty/`;
 
   userCapturedElement.innerHTML = capturedByWhite
     .map((file) => `<img src="${base}${file}" alt="">`)
@@ -275,14 +342,60 @@ function updateCapturedPieces() {
 }
 
 // NEW GAME
-newGameBtn.addEventListener("click", () => {
+function resetGame() {
   game.reset();
   lastMove = null;
   lastEval = { type: "cp", value: 0 };
   hintShape = null;
   hintTextElement.textContent = "Hint: -";
+
+  if (botCapturedElement) botCapturedElement.innerHTML = "";
+  if (userCapturedElement) userCapturedElement.innerHTML = "";
+
   engineThinking = false;
   syncBoard();
+}
+
+const avatarFiles = [
+  "avatar1.svg",
+  "avatar6.svg",
+  "avatar9.svg",
+  "avatar10.svg",
+  "avatar11.svg",
+  "avatar13.svg",
+  "avatar15.svg",
+];
+
+function pickAvatar(fileName) {
+  return `${import.meta.env.BASE_URL}avatar/${fileName}`;
+}
+
+const userAvatarImg = document.querySelector(".user-avatar img");
+const botAvatarImg = document.querySelector(".bot-avatar img");
+
+if (userAvatarImg) userAvatarImg.src = pickAvatar("avatar11.svg");
+if (botAvatarImg) botAvatarImg.src = pickAvatar("avatar6.svg");
+
+function openConfirmModal() {
+  confirmModal?.classList.remove("hidden");
+}
+
+function closeConfirmModal() {
+  confirmModal?.classList.add("hidden");
+}
+
+// NEW GAME WITH CONFIRMATION
+newGameBtn.addEventListener("click", openConfirmModal);
+
+cancelNewGameBtn?.addEventListener("click", closeConfirmModal);
+
+confirmNewGameBtn?.addEventListener("click", () => {
+  closeConfirmModal();
+  resetGame();
+});
+
+confirmModal?.addEventListener("click", (e) => {
+  if (e.target === confirmModal) closeConfirmModal();
 });
 
 // UNDO

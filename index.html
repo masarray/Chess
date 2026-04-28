@@ -18,13 +18,18 @@
       </div>
 
       <div class="player-card bot-card">
-        <div class="avatar">🤖</div>
+        <div class="avatar-wrap">
+          <div class="avatar bot-avatar">
+            <img src="/Chess/avatar/avatar6.svg" alt="bot" />
+          </div>
+          <span class="status-dot"></span>
+        </div>
         <div class="player-info">
-          <div id="botCaptured" class="captured"></div>
-          <div class="player-name">Stockfish Bot</div>
+          <div class="player-name">Chess AI</div>
           <div class="player-sub">
             Level <span id="levelLabel">Casual</span>
           </div>
+          <div id="botCaptured" class="captured captured-row"></div>
         </div>
         <select id="level">
           <option value="1">Beginner</option>
@@ -44,11 +49,16 @@
       </div>
 
       <div class="player-card user-card">
-        <div class="avatar user-avatar">🙂</div>
+        <div class="avatar-wrap">
+          <div class="avatar user-avatar">
+            <img src="/Chess/avatar/avatar11.svg" alt="user" />
+          </div>
+          <span class="status-dot"></span>
+        </div>
         <div class="player-info">
-          <div id="userCaptured" class="captured"></div>
-          <div class="player-name">You</div>
-          <div id="status" class="player-sub">Ready</div>
+          <div class="player-name">Kamu</div>
+          <div id="status" class="player-sub">Siap</div>
+          <div id="userCaptured" class="captured captured-row"></div>
         </div>
         <div id="eval-chip">0.0</div>
       </div>
@@ -72,6 +82,18 @@
       </div>
 
       <div id="hintText">Hint: -</div>
+    </div>
+
+    <div id="confirmModal" class="modal hidden">
+      <div class="modal-card">
+        <div class="modal-icon">♟</div>
+        <div class="modal-title">Start new game?</div>
+        <div class="modal-text">Your current game will be reset.</div>
+        <div class="modal-actions">
+          <button id="cancelNewGame" class="modal-btn secondary">Cancel</button>
+          <button id="confirmNewGame" class="modal-btn danger">New Game</button>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="/src/main.js"></script>
