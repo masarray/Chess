@@ -11,6 +11,7 @@ const game = new Chess();
 initEngine();
 
 const boardElement = document.getElementById("board");
+const boardWrapElement = document.getElementById("board-wrap");
 const statusElement = document.getElementById("status");
 const botStatusTextElement = document.getElementById("botStatusText");
 const evalFillElement = document.getElementById("eval-fill");
@@ -98,6 +99,27 @@ let lastMove = null;
 let lastEval = { type: "cp", value: 0 };
 let hintShape = null;
 let cg;
+let boardBoundsRefreshQueued = false;
+
+function refreshBoardBounds() {
+  if (!cg || boardBoundsRefreshQueued) return;
+
+  boardBoundsRefreshQueued = true;
+  requestAnimationFrame(() => {
+    boardBoundsRefreshQueued = false;
+    cg.state.dom.bounds.clear();
+    cg.redrawAll();
+  });
+}
+
+function watchBoardLayout() {
+  if (!window.ResizeObserver) return;
+
+  const observer = new ResizeObserver(refreshBoardBounds);
+  [boardWrapElement, botCard, userCard].forEach((element) => {
+    if (element) observer.observe(element);
+  });
+}
 
 const levelSelect = document.getElementById("level");
 const levelLabelElement = document.getElementById("levelLabel");
@@ -191,34 +213,35 @@ function updateStatus() {
     return;
   }
 
-  // 🎯 BOT THINKING (human style)
   if (engineThinking) {
-    const messages = [
-      "Oh gitu main nya.",
-      "Hmm... Boleh juga 🤔",
-      "maen sat-set yok..",
-      "Oke.. gw ada ide...",
+    const thinkingMessages = [
+      "Oh gitu mainnya.",
+      "Hmm... boleh juga 🤔",
+      "Maen sat-set yok...",
+      "Oke... gw ada ide...",
     ];
 
-    const msg = messages[Math.floor(Math.random() * messages.length)];
+    const msg =
+      thinkingMessages[Math.floor(Math.random() * thinkingMessages.length)];
 
     if (botStatusTextElement) botStatusTextElement.textContent = msg;
     statusElement.textContent = "Menunggu AI jalan...";
     return;
   }
 
-  const msg = messages[Math.floor(Math.random() * messages.length)];
-  statusElement.textContent = msg;
-  return;
-}
+  if (game.turn() === "w") {
+    if (botStatusTextElement) {
+      botStatusTextElement.textContent = "Gw nungguin bro";
+    }
 
-if (game.turn() === "w") {
-  if (botStatusTextElement)
-    botStatusTextElement.textContent = "gw nungguin bro";
-  statusElement.textContent = "Yuk... Giliran Kamu!";
-} else {
-  if (botStatusTextElement)
+    statusElement.textContent = "Yuk... Giliran Kamu!";
+    return;
+  }
+
+  if (botStatusTextElement) {
     botStatusTextElement.textContent = "Ini langkah terbaik gw...";
+  }
+
   statusElement.textContent = "Menunggu AI jalan...";
 }
 
@@ -240,9 +263,11 @@ function syncBoard() {
       free: false,
       color: engineThinking ? undefined : "white",
       dests: getDests(),
+      showDests: true,
       events: {
         after: onMove,
       },
+      rookCastle: true,
     },
   });
 
@@ -250,6 +275,7 @@ function syncBoard() {
   updateHistory();
   updateEvalBar();
   updateCapturedPieces();
+  refreshBoardBounds();
 }
 
 function onMove(orig, dest) {
@@ -584,12 +610,25 @@ cg = Chessground(boardElement, {
   fen: game.fen(),
   turnColor: "white",
 
-  animation: { enabled: true, duration: 200 },
+  animation: { enabled: true, duration: 120 },
+
+  // 🔥 TAMBAHKAN DI ROOT
+  draggable: {
+    enabled: true,
+    showGhost: true,
+  },
+
+  // 🔥 OPTIONAL UX
+  selectable: {
+    enabled: true,
+  },
 
   movable: {
     free: false,
     color: "white",
     dests: getDests(),
+    showDests: true,
+
     events: {
       after: onMove,
     },
@@ -608,4 +647,5 @@ if (botNameElement) {
 }
 
 loadBoardTheme();
+watchBoardLayout();
 syncBoard();

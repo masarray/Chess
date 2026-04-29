@@ -201,7 +201,7 @@ body {
   aspect-ratio: 1 / 1;
   border-radius: 18px;
   overflow: hidden;
-  touch-action: manipulation;
+  touch-action: none;
 }
 
 /* Force Chessground to obey parent size */
@@ -1572,6 +1572,44 @@ body.ai-thinking #undo {
 
 /* ===== FIX: HINT OVERLAY MUST NEVER BLOCK PIECES ===== */
 
+.cg-wrap svg,
+.cg-wrap svg *,
+.cg-wrap .cg-shapes,
+.cg-wrap .cg-shapes *,
+.cg-wrap .cg-custom-svgs,
+.cg-wrap .cg-custom-svgs * {
+  pointer-events: none !important;
+}
+
+/* ===== IMPROVE TOUCH PRECISION ===== */
+
+/* ===== FIX PIECE HITBOX ALIGNMENT ===== */
+
+.cg-wrap piece {
+  cursor: grab;
+  touch-action: none;
+  will-change: transform;
+}
+
+.cg-wrap piece:active {
+  cursor: grabbing;
+}
+
+/* cegah highlight aneh di mobile */
+.cg-wrap {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.cg-wrap square.selected {
+  background: radial-gradient(
+    circle,
+    rgba(56, 189, 248, 0.6),
+    rgba(56, 189, 248, 0.2)
+  ) !important;
+}
+
+/* overlays tidak boleh menangkap klik/touch */
 .cg-wrap svg,
 .cg-wrap svg *,
 .cg-wrap .cg-shapes,
