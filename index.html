@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chess PWA</title>
+    <title>Catur AI</title>
     <link rel="stylesheet" href="/src/style.css" />
     <!-- Favicon (browser tab) -->
     <link rel="icon" href="/Chess/favicon.ico" sizes="any" />
@@ -22,7 +22,7 @@
       <div id="appbar">
         <div class="brand">
           <span class="brand-icon">♟</span>
-          <span>Chess</span>
+          <span>Catur</span>
         </div>
         <div class="menu-icon">☰</div>
       </div>
@@ -36,17 +36,18 @@
           <span class="status-dot"></span>
         </div>
         <div class="player-info">
-          <div class="player-name">Chess AI</div>
+          <div class="player-name">AI Catur</div>
           <div class="player-sub">
             Level <span id="levelLabel">Casual</span>
           </div>
+          <div id="botStatusText" class="bot-status-text">Yuk mulai bro..</div>
           <div id="botCaptured" class="captured captured-row"></div>
         </div>
         <select id="level">
-          <option value="1">Beginner</option>
-          <option value="2" selected>Casual</option>
-          <option value="3">Intermediate</option>
-          <option value="4">Master</option>
+          <option value="1">Belajaran</option>
+          <option value="2" selected>Pemula</option>
+          <option value="3">Lumayan</option>
+          <option value="4">Jago</option>
         </select>
       </div>
 
@@ -125,6 +126,26 @@
         <div class="modal-actions">
           <button id="cancelNewGame" class="modal-btn secondary">Cancel</button>
           <button id="confirmNewGame" class="modal-btn danger">New Game</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="modal hidden">
+      <div class="modal-card">
+        <div class="modal-title">Settings</div>
+
+        <div style="margin-top: 12px; text-align: left">
+          <div style="font-size: 13px; margin-bottom: 6px">Board Theme</div>
+          <select id="boardThemeSelect" class="settings-select">
+            <option value="green">Hijau</option>
+            <option value="brown">Kayu</option>
+            <option value="blue">Koran</option>
+          </select>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 18px">
+          <button id="closeSettings" class="modal-btn secondary">Close</button>
         </div>
       </div>
     </div>

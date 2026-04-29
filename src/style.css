@@ -275,51 +275,51 @@ body {
 /* ===== CUSTOM PIECES: NEO PNG ===== */
 
 .cg-wrap piece.white.pawn {
-  background-image: url("/Chess/pieces/neo/wp.png") !important;
+  background-image: url("/Chess/pieces/neo2/wP.png") !important;
 }
 
 .cg-wrap piece.white.rook {
-  background-image: url("/Chess/pieces/neo/wr.png") !important;
+  background-image: url("/Chess/pieces/neo2/wR.png") !important;
 }
 
 .cg-wrap piece.white.knight {
-  background-image: url("/Chess/pieces/neo/wn.png") !important;
+  background-image: url("/Chess/pieces/neo2/wN.png") !important;
 }
 
 .cg-wrap piece.white.bishop {
-  background-image: url("/Chess/pieces/neo/wb.png") !important;
+  background-image: url("/Chess/pieces/neo2/wB.png") !important;
 }
 
 .cg-wrap piece.white.queen {
-  background-image: url("/Chess/pieces/neo/wq.png") !important;
+  background-image: url("/Chess/pieces/neo2/wQ.png") !important;
 }
 
 .cg-wrap piece.white.king {
-  background-image: url("/Chess/pieces/neo/wk.png") !important;
+  background-image: url("/Chess/pieces/neo2/wK.png") !important;
 }
 
 .cg-wrap piece.black.pawn {
-  background-image: url("/Chess/pieces/neo/bp.png") !important;
+  background-image: url("/Chess/pieces/neo2/bP.png") !important;
 }
 
 .cg-wrap piece.black.rook {
-  background-image: url("/Chess/pieces/neo/br.png") !important;
+  background-image: url("/Chess/pieces/neo2/bR.png") !important;
 }
 
 .cg-wrap piece.black.knight {
-  background-image: url("/Chess/pieces/neo/bn.png") !important;
+  background-image: url("/Chess/pieces/neo2/bN.png") !important;
 }
 
 .cg-wrap piece.black.bishop {
-  background-image: url("/Chess/pieces/neo/bb.png") !important;
+  background-image: url("/Chess/pieces/neo2/bB.png") !important;
 }
 
 .cg-wrap piece.black.queen {
-  background-image: url("/Chess/pieces/neo/bq.png") !important;
+  background-image: url("/Chess/pieces/neo2/bQ.png") !important;
 }
 
 .cg-wrap piece.black.king {
-  background-image: url("/Chess/pieces/neo/bk.png") !important;
+  background-image: url("/Chess/pieces/neo2/bK.png") !important;
 }
 
 #eval-bar {
@@ -534,11 +534,19 @@ button {
 }
 
 /* Custom board theme: newspaper */
-.cg-wrap cg-board {
+/* DEFAULT */
+body[data-board="green"] .cg-wrap cg-board {
   background-image: url("/Chess/board/green_triangle.png") !important;
-  background-size: 100% 100% !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
+}
+
+/* BROWN */
+body[data-board="brown"] .cg-wrap cg-board {
+  background-image: url("/Chess/board/wood3.jpg") !important;
+}
+
+/* BLUE */
+body[data-board="blue"] .cg-wrap cg-board {
+  background-image: url("/Chess/board/newspaper.svg") !important;
 }
 
 /* Hilangkan warna square bawaan agar SVG board terlihat */
@@ -992,13 +1000,6 @@ body {
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    rgba(2, 6, 23, 0.58),
-    rgba(7, 17, 31, 0.18) 20%,
-    rgba(7, 17, 31, 0.18) 80%,
-    rgba(2, 6, 23, 0.58)
-  );
   z-index: 0;
 }
 
@@ -1158,4 +1159,424 @@ body {
 
 .tool span:not(.icon) {
   display: none;
+}
+
+.bot-card.pulse {
+  animation: pulseGlow 0.8s ease;
+}
+
+@keyframes pulseGlow {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(0, 255, 150, 0);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(0, 255, 150, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(0, 255, 150, 0);
+  }
+}
+
+/* ===== FINAL POLISH OVERRIDE: TACTILE ACTIONS + BOT CHAT ===== */
+
+.bot-status-text {
+  margin-top: 4px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #dbeafe;
+  background: rgba(56, 189, 248, 0.11);
+  border: 1px solid rgba(56, 189, 248, 0.16);
+  font-size: 11.5px;
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bot-card.thinking .bot-status-text {
+  color: #fff7ed;
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.28);
+  animation: botTextBreath 1.2s ease-in-out infinite;
+}
+
+@keyframes botTextBreath {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.player-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.player-card::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    transparent 38%,
+    rgba(255, 255, 255, 0.025)
+  );
+}
+
+#bottom-bar {
+  gap: 10px;
+}
+
+.tool {
+  position: relative;
+  overflow: hidden;
+  min-height: 54px !important;
+  border-radius: 14px !important;
+  transform: translateY(0);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease,
+    filter 0.12s ease;
+}
+
+.tool::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(255, 255, 255, 0.28),
+    transparent 42%
+  );
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.tool::after {
+  content: "";
+  position: absolute;
+  inset: auto 14px 7px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  filter: blur(1px);
+}
+
+.tool:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.38),
+    0 16px 30px rgba(0, 0, 0, 0.38) !important;
+}
+
+.tool:active {
+  transform: translateY(1px) scale(0.985);
+  filter: brightness(0.92);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.42),
+    0 6px 14px rgba(0, 0, 0, 0.26) !important;
+}
+
+.tool svg {
+  position: relative;
+  z-index: 2;
+  transition:
+    transform 0.12s ease,
+    filter 0.12s ease;
+}
+
+.tool:hover svg {
+  transform: scale(1.08);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 8px rgba(255, 255, 255, 0.22));
+}
+
+body.ai-thinking .tool {
+  opacity: 0.72;
+}
+
+body.ai-thinking #hint,
+body.ai-thinking #undo {
+  pointer-events: none;
+}
+
+.settings-select {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 10px;
+  border: none;
+  padding: 0 10px;
+  font-weight: 600;
+}
+
+/* ===== TACTILE MENU BUTTON ===== */
+
+.menu-icon {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 255, 255, 0.22),
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.13),
+      rgba(255, 255, 255, 0.045)
+    ),
+    rgba(15, 23, 42, 0.72);
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 10px 24px rgba(0, 0, 0, 0.28);
+
+  backdrop-filter: blur(12px);
+
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    filter 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.menu-icon::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(
+    circle,
+    rgba(56, 189, 248, 0.45),
+    transparent 55%
+  );
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+  pointer-events: none;
+}
+
+.menu-icon:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+  border-color: rgba(56, 189, 248, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 14px 30px rgba(0, 0, 0, 0.36),
+    0 0 14px rgba(56, 189, 248, 0.18);
+}
+
+.menu-icon:active {
+  transform: translateY(1px) scale(0.95);
+  filter: brightness(0.92);
+  border-color: rgba(56, 189, 248, 0.52);
+  box-shadow:
+    inset 0 3px 10px rgba(0, 0, 0, 0.42),
+    0 5px 14px rgba(0, 0, 0, 0.25),
+    0 0 22px rgba(56, 189, 248, 0.45);
+}
+
+.menu-icon:active::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ===== TACTILE MODAL BUTTON (CLOSE) ===== */
+
+.modal-btn.secondary {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 255, 255, 0.18),
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.04)
+    ),
+    rgba(30, 41, 59, 0.65);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 8px 20px rgba(0, 0, 0, 0.3);
+
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    filter 0.12s ease,
+    border-color 0.12s ease;
+}
+
+/* glow layer */
+.modal-btn.secondary::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.4), transparent 55%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+  pointer-events: none;
+}
+
+/* HOVER */
+.modal-btn.secondary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  border-color: rgba(56, 189, 248, 0.28);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 12px 26px rgba(0, 0, 0, 0.35),
+    0 0 12px rgba(56, 189, 248, 0.18);
+}
+
+/* PRESS */
+.modal-btn.secondary:active {
+  transform: translateY(1px) scale(0.96);
+  filter: brightness(0.92);
+  border-color: rgba(56, 189, 248, 0.5);
+
+  box-shadow:
+    inset 0 3px 10px rgba(0, 0, 0, 0.45),
+    0 5px 14px rgba(0, 0, 0, 0.25),
+    0 0 18px rgba(56, 189, 248, 0.45);
+}
+
+.modal-btn.secondary:active::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-btn.danger {
+  transition: all 0.12s ease;
+}
+
+.modal-btn.danger:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.modal-btn.danger:active {
+  transform: translateY(1px) scale(0.96);
+  filter: brightness(0.9);
+}
+
+/* ===== TACTILE MODAL BUTTON (DANGER / NEW GAME) ===== */
+
+.modal-btn.danger {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 255, 255, 0.24),
+      transparent 45%
+    ),
+    linear-gradient(180deg, #ef4444, #b91c1c);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 10px 22px rgba(127, 29, 29, 0.38);
+
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    filter 0.12s ease;
+}
+
+.modal-btn.danger::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.42),
+    transparent 55%
+  );
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+  pointer-events: none;
+}
+
+.modal-btn.danger:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 14px 28px rgba(127, 29, 29, 0.46),
+    0 0 16px rgba(239, 68, 68, 0.32);
+}
+
+.modal-btn.danger:active {
+  transform: translateY(1px) scale(0.96);
+  filter: brightness(0.9);
+
+  box-shadow:
+    inset 0 3px 10px rgba(0, 0, 0, 0.42),
+    0 5px 14px rgba(127, 29, 29, 0.3),
+    0 0 22px rgba(239, 68, 68, 0.48);
+}
+
+.modal-btn.danger:active::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ===== FIX: HINT OVERLAY MUST NEVER BLOCK PIECES ===== */
+
+.cg-wrap svg,
+.cg-wrap svg *,
+.cg-wrap .cg-shapes,
+.cg-wrap .cg-shapes *,
+.cg-wrap .cg-custom-svgs,
+.cg-wrap .cg-custom-svgs * {
+  pointer-events: none !important;
 }

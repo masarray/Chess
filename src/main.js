@@ -12,6 +12,7 @@ initEngine();
 
 const boardElement = document.getElementById("board");
 const statusElement = document.getElementById("status");
+const botStatusTextElement = document.getElementById("botStatusText");
 const evalFillElement = document.getElementById("eval-fill");
 const evalScoreElement = document.getElementById("eval-score");
 
@@ -35,6 +36,13 @@ const sound = {
 
 const userStatusDot = document.querySelector(".user-card .status-dot");
 const botStatusDot = document.querySelector(".bot-card .status-dot");
+
+const botNameElement = document.querySelector(".bot-card .player-name");
+
+const settingsModal = document.getElementById("settingsModal");
+const boardThemeSelect = document.getElementById("boardThemeSelect");
+const closeSettingsBtn = document.getElementById("closeSettings");
+const menuIcon = document.querySelector(".menu-icon");
 
 function setStatus(dot, state) {
   if (!dot) return;
@@ -85,7 +93,7 @@ function playMoveSound(move) {
 }
 
 let engineThinking = false;
-let BOT_LEVEL = 2;
+let BOT_LEVEL = 3;
 let lastMove = null;
 let lastEval = { type: "cp", value: 0 };
 let hintShape = null;
@@ -102,8 +110,14 @@ levelSelect.addEventListener("change", () => {
   BOT_LEVEL = parseInt(levelSelect.value);
 
   const selectedText = levelSelect.options[levelSelect.selectedIndex].text;
+
   if (levelLabelElement) {
     levelLabelElement.textContent = selectedText;
+  }
+
+  // ✅ UPDATE BOT NAME
+  if (botNameElement) {
+    botNameElement.textContent = `AI ${selectedText}`;
   }
 });
 
@@ -116,6 +130,7 @@ function setTurn(state) {
 
   if (state === "user") {
     userCard.classList.add("active");
+    document.body.classList.remove("ai-thinking");
 
     // user sedang giliran, bot tetap online/standby
     setStatus(userStatusDot, "online");
@@ -124,6 +139,13 @@ function setTurn(state) {
 
   if (state === "bot") {
     botCard.classList.add("thinking");
+    document.body.classList.add("ai-thinking");
+
+    // 🔥 tambahan animasi biar hidup
+    botCard.classList.add("pulse");
+    setTimeout(() => {
+      botCard.classList.remove("pulse");
+    }, 800);
 
     // bot sedang berpikir
     setStatus(botStatusDot, "thinking");
@@ -133,6 +155,7 @@ function setTurn(state) {
   if (state === "gameover") {
     userCard.classList.remove("active");
     botCard.classList.remove("thinking");
+    document.body.classList.remove("ai-thinking");
 
     setStatus(userStatusDot, "offline");
     setStatus(botStatusDot, "offline");
@@ -159,15 +182,44 @@ function updateStatus() {
   if (game.isCheckmate()) {
     statusElement.textContent = "Checkmate";
     setTurn("gameover");
-  } else if (game.isDraw()) {
+    return;
+  }
+
+  if (game.isDraw()) {
     statusElement.textContent = "Draw";
     setTurn("gameover");
-  } else if (engineThinking) {
-    statusElement.textContent = "Sabar... AI lagi mikir...";
-  } else {
-    statusElement.textContent =
-      game.turn() === "w" ? "Yuk.. Giliran Kamu Jalan" : "Giliran Hitam Jalan";
+    return;
   }
+
+  // 🎯 BOT THINKING (human style)
+  if (engineThinking) {
+    const messages = [
+      "Oh gitu main nya.",
+      "Hmm... Boleh juga 🤔",
+      "maen sat-set yok..",
+      "Oke.. gw ada ide...",
+    ];
+
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+
+    if (botStatusTextElement) botStatusTextElement.textContent = msg;
+    statusElement.textContent = "Menunggu AI jalan...";
+    return;
+  }
+
+  const msg = messages[Math.floor(Math.random() * messages.length)];
+  statusElement.textContent = msg;
+  return;
+}
+
+if (game.turn() === "w") {
+  if (botStatusTextElement)
+    botStatusTextElement.textContent = "gw nungguin bro";
+  statusElement.textContent = "Yuk... Giliran Kamu!";
+} else {
+  if (botStatusTextElement)
+    botStatusTextElement.textContent = "Ini langkah terbaik gw...";
+  statusElement.textContent = "Menunggu AI jalan...";
 }
 
 function syncBoard() {
@@ -369,13 +421,13 @@ function updateCapturedPieces() {
     const piece = move.captured.toUpperCase(); // P,N,B,R,Q
 
     if (move.color === "w") {
-      capturedByWhite.push(`b${piece}.svg`);
+      capturedByWhite.push(`b${piece}.png`);
     } else {
-      capturedByBlack.push(`w${piece}.svg`);
+      capturedByBlack.push(`w${piece}.png`);
     }
   });
 
-  const base = `${import.meta.env.BASE_URL}pieces/neo/`;
+  const base = `${import.meta.env.BASE_URL}pieces/neo2/`;
 
   userCapturedElement.innerHTML = capturedByWhite
     .map((file) => `<img src="${base}${file}" alt="">`)
@@ -431,6 +483,38 @@ function openConfirmModal() {
 function closeConfirmModal() {
   confirmModal?.classList.add("hidden");
 }
+
+function applyBoardTheme(theme) {
+  document.body.dataset.board = theme;
+  localStorage.setItem("boardTheme", theme);
+}
+
+function loadBoardTheme() {
+  const saved = localStorage.getItem("boardTheme") || "green";
+  applyBoardTheme(saved);
+
+  if (boardThemeSelect) {
+    boardThemeSelect.value = saved;
+  }
+}
+
+menuIcon?.addEventListener("click", () => {
+  settingsModal?.classList.remove("hidden");
+});
+
+closeSettingsBtn?.addEventListener("click", () => {
+  settingsModal?.classList.add("hidden");
+});
+
+settingsModal?.addEventListener("click", (e) => {
+  if (e.target === settingsModal) {
+    settingsModal.classList.add("hidden");
+  }
+});
+
+boardThemeSelect?.addEventListener("change", () => {
+  applyBoardTheme(boardThemeSelect.value);
+});
 
 // NEW GAME WITH CONFIRMATION
 newGameBtn.addEventListener("click", openConfirmModal);
@@ -512,4 +596,16 @@ cg = Chessground(boardElement, {
   },
 });
 
+// INIT DEFAULT LEVEL (biar konsisten saat load)
+const defaultText = levelSelect.options[levelSelect.selectedIndex].text;
+
+if (levelLabelElement) {
+  levelLabelElement.textContent = defaultText;
+}
+
+if (botNameElement) {
+  botNameElement.textContent = `AI ${defaultText}`;
+}
+
+loadBoardTheme();
 syncBoard();
