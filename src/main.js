@@ -116,14 +116,26 @@ function setTurn(state) {
 
   if (state === "user") {
     userCard.classList.add("active");
+
+    // user sedang giliran, bot tetap online/standby
     setStatus(userStatusDot, "online");
-    setStatus(botStatusDot, "offline");
+    setStatus(botStatusDot, "online");
   }
 
   if (state === "bot") {
     botCard.classList.add("thinking");
+
+    // bot sedang berpikir
     setStatus(botStatusDot, "thinking");
     setStatus(userStatusDot, "online");
+  }
+
+  if (state === "gameover") {
+    userCard.classList.remove("active");
+    botCard.classList.remove("thinking");
+
+    setStatus(userStatusDot, "offline");
+    setStatus(botStatusDot, "offline");
   }
 }
 
@@ -146,17 +158,15 @@ function getDests() {
 function updateStatus() {
   if (game.isCheckmate()) {
     statusElement.textContent = "Checkmate";
-    setStatus(userStatusDot, "offline");
-    setStatus(botStatusDot, "offline");
+    setTurn("gameover");
   } else if (game.isDraw()) {
     statusElement.textContent = "Draw";
-    setStatus(userStatusDot, "offline");
-    setStatus(botStatusDot, "offline");
+    setTurn("gameover");
   } else if (engineThinking) {
-    statusElement.textContent = "Computer thinking...";
+    statusElement.textContent = "Sabar... AI lagi mikir...";
   } else {
     statusElement.textContent =
-      game.turn() === "w" ? "White to move" : "Black to move";
+      game.turn() === "w" ? "Yuk.. Giliran Kamu Jalan" : "Giliran Hitam Jalan";
   }
 }
 
@@ -365,7 +375,7 @@ function updateCapturedPieces() {
     }
   });
 
-  const base = `${import.meta.env.BASE_URL}pieces/staunty/`;
+  const base = `${import.meta.env.BASE_URL}pieces/neo/`;
 
   userCapturedElement.innerHTML = capturedByWhite
     .map((file) => `<img src="${base}${file}" alt="">`)
